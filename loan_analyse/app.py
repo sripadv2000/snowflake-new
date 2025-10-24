@@ -106,15 +106,21 @@ def get_sql_from_cortex(prompt):
         raise Exception(f"Cortex Analyst Error: {response.text}")
 
     res_json = response.json()
+    print("Parsed JSON:")
+    print(res_json)
+    print("===================================\n")
     sql_query = None
 
     for msg in res_json.get("messages", []):
+        print("Inspecting message:", msg)
         if msg.get("role") != "assistant":
             continue
 
         content = msg.get("content")
+        print("Message content:", content)
         if isinstance(content, list):
             for item in content:
+                print("Inspecting content item:", item)
                 if item.get("type") == "text" and item.get("text"):
                     sql_query = item["text"].strip()
                     break
@@ -125,7 +131,9 @@ def get_sql_from_cortex(prompt):
             break
 
     if not sql_query:
-        raise Exception("Cortex Analyst did not return a SQL query. Check logs for details.")
+        raise Exception(
+            "Cortex Analyst did not return a SQL query. Check logs for details."
+        )
 
     return sql_query
 
@@ -148,6 +156,10 @@ def run_query_on_snowflake(sql_query):
         "warehouse": SNOWFLAKE_WAREHOUSE,
         "role": SNOWFLAKE_ROLE
     }
+
+    print("\n===== Snowflake SQL Request =====")
+    print("Payload:", payload)
+    print("==================================\n")
 
     response = requests.post(STATEMENT_ENDPOINT, json=payload, headers=headers)
 
@@ -184,10 +196,15 @@ def query():
             return jsonify({"error": "Prompt is empty"}), 400
 
         # Step 1: Ask Cortex Analyst for SQL
+        print("➡️ Received prompt:", prompt)
         sql_query = get_sql_from_cortex(prompt)
+        print("✅ Generated SQL query:")
+        print(sql_query)
 
         # Step 2: Run query on Snowflake
         result = run_query_on_snowflake(sql_query)
+        print("✅ Snowflake query result:")
+        print(result)
 
         return jsonify({
             "prompt": prompt,
