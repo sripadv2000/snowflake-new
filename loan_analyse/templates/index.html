@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loan Analyst - Natural Language to SQL</title>
+  <script src="/static/script.js" defer></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h2 { color: #2c3e50; }
+    input { width: 420px; padding: 8px; }
+    button { padding: 8px 16px; margin-left: 8px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 15px; border-radius: 6px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Loan Analyst - Natural Language to SQL</h2>
+  <input id="prompt" placeholder="e.g., 'Show top 5 highest loans'" />
+  <button onclick="sendPrompt()">Submit</button>
+  <pre id="output"></pre>
+</body>
+</html>
