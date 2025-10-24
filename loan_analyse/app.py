@@ -72,7 +72,15 @@ def get_sql_from_cortex(prompt):
     payload = {
         "model": "cortex-analyst",
         "messages": [
-            {"role": "user", "content": prompt}
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            }
         ],
         "semantic_view": SEMANTIC_VIEW
     }
@@ -101,14 +109,25 @@ def get_sql_from_cortex(prompt):
     sql_query = None
 
     for msg in res_json.get("messages", []):
-        if msg.get("role") == "assistant":
-            sql_query = msg.get("content")
+        if msg.get("role") != "assistant":
+            continue
+
+        content = msg.get("content")
+        if isinstance(content, list):
+            for item in content:
+                if item.get("type") == "text" and item.get("text"):
+                    sql_query = item["text"].strip()
+                    break
+        elif isinstance(content, str) and content.strip():
+            sql_query = content.strip()
+
+        if sql_query:
             break
 
     if not sql_query:
         raise Exception("Cortex Analyst did not return a SQL query. Check logs for details.")
 
-    return sql_query.strip()
+    return sql_query
 
 
 # ==========================================
